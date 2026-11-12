@@ -208,7 +208,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {departments.slice(0, 6).map((d) => {
+            {(departments || []).slice(0, 6).map((d) => {
               const theme = DEPT_COLORS[d.code] || {
                 iconBg: 'bg-brand-50 text-brand-700 ring-brand-200 group-hover:bg-brand-600 group-hover:text-white',
                 badge: 'Govt Dept',

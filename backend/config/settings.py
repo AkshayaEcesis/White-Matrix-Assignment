@@ -38,7 +38,7 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is false.")
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ".onrender.com,localhost,127.0.0.1")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -223,14 +223,18 @@ SIMPLE_JWT = {
 JWT_REFRESH_COOKIE_NAME = "cmk_refresh"
 JWT_COOKIE_PATH = "/api/v1/auth/"
 JWT_COOKIE_SECURE = env_bool("JWT_COOKIE_SECURE", not DEBUG)
-# Strict works because the frontend reaches the API through a same-origin proxy
-# (Vite dev proxy locally, Vercel rewrites in production).
-JWT_COOKIE_SAMESITE = os.getenv("JWT_COOKIE_SAMESITE", "Strict")
+# SameSite=None + Secure=True allows HttpOnly refresh cookies across Vercel and Render domains.
+JWT_COOKIE_SAMESITE = os.getenv("JWT_COOKIE_SAMESITE", "None" if not DEBUG else "Lax")
 
 # --------------------------------------------------------------------------- #
-# CORS (only needed if the frontend calls the API cross-origin instead of via the proxy)
+# CORS (supports both Vercel same-origin rewrites and direct cross-origin calls)
 # --------------------------------------------------------------------------- #
 CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ["Content-Disposition"]
 CORS_URLS_REGEX = r"^/api/.*$"

@@ -52,9 +52,9 @@ function AssignForm({ grievance: g, onDone }) {
         <p className="text-xs text-violet-700">AI suggested: {g.ai_suggested_department.name} (pre-selected, you can change it)</p>
       )}
       <Select label="Department" required value={department} onChange={(e) => { setDepartment(e.target.value); setOfficer('') }}
-        options={departments.map((d) => ({ value: String(d.id), label: d.name }))} error={error} />
+        options={(departments || []).map((d) => ({ value: String(d.id), label: d.name }))} error={error} />
       <Select label="Officer" value={officer} onChange={(e) => setOfficer(e.target.value)} placeholder="Department pool (any officer)"
-        options={officers.map((o) => ({ value: String(o.id), label: `${o.full_name}${o.designation ? ` — ${o.designation}` : ''}` }))}
+        options={(officers || []).map((o) => ({ value: String(o.id), label: `${o.full_name}${o.designation ? ` — ${o.designation}` : ''}` }))}
         disabled={!department} />
       <Textarea label="Instructions to the department" rows={3} value={instructions} onChange={(e) => setInstructions(e.target.value)} maxLength={2000} />
       <Button type="submit" icon={Send} loading={pending} className="w-full">{g.department ? 'Reassign' : 'Forward to department'}</Button>
@@ -125,10 +125,10 @@ export default function CMOGrievanceDetail() {
                   g.reopened_count > 0 && { label: 'Times reopened', value: g.reopened_count },
                 ]} />
 
-                {g.action_reports.length > 0 && (
+                {(g.action_reports || []).length > 0 && (
                   <Card title="Action-taken reports">
                     <div className="space-y-4">
-                      {g.action_reports.map((r) => (
+                      {(g.action_reports || []).map((r) => (
                         <ActionReportCard key={r.id} report={r} actions={r.review_status === 'PENDING' && (
                           <>
                             <Button variant="secondary" icon={XCircle} onClick={() => setDialog({ type: 'reject', report: r })}>Request more action</Button>
@@ -148,10 +148,10 @@ export default function CMOGrievanceDetail() {
                   <RemarksPanel remarks={g.remarks} allowVisibility
                     onAdd={async (body) => { await cmoApi.addRemark(g.reference_number, body); reload() }} />
                 </Card>
-                {g.feedback.length > 0 && (
+                {(g.feedback || []).length > 0 && (
                   <Card title="Citizen feedback">
                     <ul className="space-y-2 text-sm">
-                      {g.feedback.map((f) => (
+                      {(g.feedback || []).map((f) => (
                         <li key={f.id}>
                           <span className="font-medium">{f.rating}/5</span> · {f.is_satisfied ? 'Satisfied' : 'Not satisfied'}
                           {f.comments && <span className="text-slate-600"> — {f.comments}</span>}

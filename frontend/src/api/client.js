@@ -44,8 +44,8 @@ export function refreshSession() {
     refreshPromise = authClient
       .post('/auth/refresh/')
       .then(({ status, data }) => {
-        // 204 = no session cookie (visitor is simply not logged in)
-        if (status === 204 || !data?.access) throw new Error('No active session')
+        // 204 = no session cookie (visitor is simply not logged in), or HTML returned on error
+        if (status === 204 || typeof data === 'string' || !data?.access) throw new Error('No active session')
         accessToken = data.access
         return data
       })
@@ -66,7 +66,12 @@ client.interceptors.request.use((config) => {
 })
 
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (typeof response.data === 'string' && response.data.trim().startsWith('<!doctype')) {
+      return Promise.reject(new Error('Backend API returned HTML instead of JSON. Check backend connection.'))
+    }
+    return response
+  },
   async (error) => {
     const original = error.config
     const isAuthCall = SESSION_ENDPOINTS.includes(original?.url)

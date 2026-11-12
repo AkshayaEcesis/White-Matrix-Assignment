@@ -168,7 +168,7 @@ export function DepartmentsPage() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <AsyncBoundary loading={!departments.length && !error} error={error} isEmpty={false}>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {departments.map((d) => {
+            {(departments || []).map((d) => {
               const iconCls = DEPT_PAGE_COLORS[d.code] || 'bg-brand-50 text-brand-700 ring-brand-200 group-hover:bg-brand-600 group-hover:text-white'
               return (
                 <article key={d.id} className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg">

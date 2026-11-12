@@ -18,11 +18,11 @@ export default function GrievanceFilters({ params, setParam, reset, fields = ['s
   }, [search]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const selects = {
-    status: { label: 'Status', options: meta.statuses },
-    district: { label: 'District', options: meta.districts },
-    category: { label: 'Category', options: meta.categories },
-    priority: { label: 'Priority', options: meta.priorities },
-    department: { label: 'Department', options: meta.departments.map((d) => ({ value: String(d.id), label: d.name })) },
+    status: { label: 'Status', options: meta?.statuses || [] },
+    district: { label: 'District', options: meta?.districts || [] },
+    category: { label: 'Category', options: meta?.categories || [] },
+    priority: { label: 'Priority', options: meta?.priorities || [] },
+    department: { label: 'Department', options: (meta?.departments || []).map((d) => ({ value: String(d.id), label: d.name })) },
   }
   const sel = 'h-10 rounded-xl border border-slate-300/80 bg-white px-3.5 text-sm text-slate-800 shadow-2xs focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-colors'
   const active = Object.keys(params).some((k) => k !== 'page')
@@ -37,7 +37,7 @@ export default function GrievanceFilters({ params, setParam, reset, fields = ['s
       {fields.filter((f) => selects[f]).map((f) => (
         <select key={f} aria-label={`Filter by ${selects[f].label}`} value={params[f] || ''} onChange={(e) => setParam(f, e.target.value)} className={sel}>
           <option value="">All {selects[f].label.toLowerCase()}s</option>
-          {selects[f].options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          {(selects[f]?.options || []).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       ))}
       {fields.includes('overdue') && (
